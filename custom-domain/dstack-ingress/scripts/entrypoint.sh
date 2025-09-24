@@ -31,6 +31,8 @@ fi
 
 setup_nginx_conf() {
     cat <<EOF >/etc/nginx/conf.d/default.conf
+limit_req_zone \$binary_remote_addr zone=perip:10m rate=30r/s;
+
 server {
     listen ${PORT} ssl;
     http2 on;
@@ -76,11 +78,15 @@ server {
         ${PROXY_CMD}_set_header X-Real-IP \$remote_addr;
         ${PROXY_CMD}_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         ${PROXY_CMD}_set_header X-Forwarded-Proto \$scheme;
+
+        limit_req zone=perip burst=10 nodelay;
     }
 
     location /evidences/ {
         alias /evidences/;
         autoindex on;
+
+        limit_req zone=perip;
     }
 }
 EOF
@@ -166,14 +172,14 @@ bootstrap() {
 # Setup certbot environment (venv is already created in Dockerfile)
 setup_certbot_env
 
-# Check if it's the first time the container is started
-if [ ! -f "/.bootstrapped" ]; then
-    bootstrap
-else
-    echo "Certificate for $DOMAIN already exists"
-fi
+# # Check if it's the first time the container is started
+# if [ ! -f "/.bootstrapped" ]; then
+#     bootstrap
+# else
+#     echo "Certificate for $DOMAIN already exists"
+# fi
 
-renewal-daemon.sh &
+# renewal-daemon.sh &
 
 setup_nginx_conf
 
