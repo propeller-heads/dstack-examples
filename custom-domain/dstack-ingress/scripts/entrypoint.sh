@@ -54,7 +54,7 @@ setup_py_env
 
 setup_nginx_conf() {
     cat <<EOF >/etc/nginx/conf.d/default.conf
-limit_req_zone \$binary_remote_addr zone=perip:10m rate=30r/s;
+limit_req_zone \$binary_remote_addr zone=perip:10m rate=250r/s;
 
 server {
     listen ${PORT} ssl;
