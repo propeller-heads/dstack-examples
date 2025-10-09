@@ -46,8 +46,7 @@ echo ""
 
 if [ "$PUSH" = true ]; then
     echo "Pushing image to $REPO..."
-    skopeo copy --insecure-policy oci-archive:./oci.tar docker://"$REPO"
-    echo "Image pushed successfully to $REPO"
+    skopeo copy --insecure-policy oci-archive:./oci.tar docker://"$REPO" && echo "Image pushed successfully to $REPO" || echo "Failed to push image to $REPO"
 else
     echo "To push the image to a registry, run:"
     echo ""
